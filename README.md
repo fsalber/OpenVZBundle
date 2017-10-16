@@ -7,7 +7,7 @@ This little bundle allow you to manage OpenVZ VMs from your Symfony application.
 First, clone this repo into your symfony's bundle folder :
 
 ```sh
-git clone https://github.com/fsalber/OpenVZBundle
+git clone https://github.com/fsalber/OpenVZBundle.git
 ```
 
 ### 2. Configuration
