@@ -4,31 +4,37 @@ This little bundle allow you to manage OpenVZ VMs from your Symfony application.
 
 ### 1. Installation
 
-First, clone this repo into your symfony's bundle folder :
+First import the bundle into your composer.json :
+
+```json
+[...]
+    "require" : {
+        [...]
+        "FSALBER/OpenVZBundle" : "dev-master"
+    },
+[...]
+    "repositories" : [{
+        "type" : "vcs",
+        "url" : { https://github.com/fsalber/OpenVZBundle.git }
+    }],
+[...]
+```
+
+After that, update your vendor : 
 
 ```sh
-git clone https://github.com/fsalber/OpenVZBundle.git
+composer update
 ```
 
-### 2. Configuration
-
-You have to configure your Namespace.
-
-Edit the line 7. from file "OpenVZApi.php" into the OpenVZBundle and remplace "YOURNAMESPACE" with your working namespace.
+then, import it in your AppKernel.php :
 
 ```php
-namespace YOURNAMESPACE\OpenVZBundle;
-```
-
-Then, import it from your controller.
-
-```php
-use YOURNAMESPACE\OpenVZBundle\OpenVZApi;
+new FSALBER\OpenVZBundle\OpenVZApi(),
 ```
 
 It's ready ! You can start using it !
 
-### 3. Usage
+### 2. Usage
 
 The bundle is very simple to use. 
 For example : We want to display every Containers (VMs) in our Index. We can use this code : 
@@ -87,6 +93,6 @@ public function createAction()
 }
 ```
 
-### 4. Support
+### 3. Support
 
 If you have any problems using this class, feel free to open a issues on github. We will take a look and try to find a solution. 
