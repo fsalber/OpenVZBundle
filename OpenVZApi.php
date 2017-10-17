@@ -4,7 +4,7 @@
  * Symfony bundle for managed OpenVZ Containers from Applications.
  * @author Florian SALBER <florian.salber@gmail.com>
  */
-namespace YOURNAMESPACE\OpenVZBundle;
+namespace FSALBER\OpenVZBundle;
 
 class OpenVZApi {
 
