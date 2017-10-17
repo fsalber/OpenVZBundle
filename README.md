@@ -26,10 +26,10 @@ After that, update your vendor :
 composer update
 ```
 
-then, import it in your AppKernel.php :
+then, import it in your controller :
 
 ```php
-new FSALBER\OpenVZBundle\OpenVZApi(),
+use FSALBER\OpenVZBundle\OpenVZApi;
 ```
 
 It's ready ! You can start using it !
