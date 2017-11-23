@@ -28,7 +28,7 @@ class OpenVZApi {
             throw new Exception('SSH connection not provided');
         }
 
-        self::$ssh = $connection;
+        $this->ssh = $connection;
     }
 
     /**
@@ -47,7 +47,7 @@ class OpenVZApi {
             /usr/bin/sudo /usr/sbin/vzctl set {$params->ctid} --cpulimit {$params->cpu_limit}m --cpus {$params->cpus} --save
             /usr/bin/sudo /usr/sbin/vzctl start {$params->ctid}";
 
-        return ssh2_exec(self::$ssh, $commands);
+        return ssh2_exec($this->ssh, $commands);
     }
 
     /**
@@ -58,7 +58,7 @@ class OpenVZApi {
     public static function destroy($ctid){
         $commands = "/usr/bin/sudo /usr/sbin/vzctl stop {$ctid}
             /usr/bin/sudo /usr/sbin/vzctl destroy {$ctid}";
-        return ssh2_exec(self::$ssh, $commands);
+        return ssh2_exec($this->ssh, $commands);
     }
 
     /**
@@ -66,8 +66,8 @@ class OpenVZApi {
      * @param object $params
      */
     public static function rebuild($params){
-        if(self::destroy($params->ctid)){
-            self::create($params);
+        if($this->estroy($params->ctid)){
+            $this->reate($params);
         }
     }
 
@@ -77,14 +77,14 @@ class OpenVZApi {
      * @return string
      */
     public static function resize($params){
-        $vdisk = ssh2_exec(self::$ssh, "/usr/sbin/vzlist {$params->ctid} -Ho diskspace");
+        $vdisk = ssh2_exec($this->ssh, "/usr/sbin/vzlist {$params->ctid} -Ho diskspace");
         if(($params->disk*1024*1024) > $vdisk){
             $commands = "/usr/bin/sudo /usr/sbin/vzctl set {$params->ctid} --ram {$params->ram}M --swap {$params->swap}M --save;
                 /usr/bin/sudo /usr/sbin/vzctl set {$params->ctid} --cpuunits {$params->cpuu} --save;
                 /usr/bin/sudo /usr/sbin/vzctl set {$params->ctid} --cpulimit {$params->cpul} --cpus {$params->cpus} --save;
                 /usr/bin/sudo /usr/sbin/vzctl set {$params->ctid} --diskspace {$params->disk}G:{$params->disk}G --save;
                 /usr/bin/sudo /usr/sbin/vzctl set {$params->ctid} --diskinodes {$params->inodes}:{$params->inodes} --save;";
-            return ssh2_exec(self::$ssh, $commands);
+            return ssh2_exec($this->ssh, $commands);
         }
         return "New disk size cannot be less than current disk size!";
     }
@@ -103,7 +103,7 @@ class OpenVZApi {
         } else {
             $commands = "/usr/bin/sudo /usr/sbin/vzctl set {$params->ctid} --ipadd {$params->ip} --save";
         }
-        return ssh2_exec(self::$ssh, $commands);
+        return ssh2_exec($this->ssh, $commands);
     }
 
     /**
@@ -120,7 +120,7 @@ class OpenVZApi {
         } else {
             $commands = "/usr/bin/sudo /usr/sbin/vzctl set {$params->ctid} --ipdel {$params->ip} --save";
         }
-        return ssh2_exec(self::$ssh, $commands);
+        return ssh2_exec($this->ssh, $commands);
     }
 
     /**
@@ -129,7 +129,7 @@ class OpenVZApi {
      * @return mixed
      */
     public static function start($ctid){
-        return ssh2_exec(self::$ssh, "/usr/bin/sudo /usr/sbin/vzctl start {$ctid}");
+        return ssh2_exec($this->ssh, "/usr/bin/sudo /usr/sbin/vzctl start {$ctid}");
     }
 
     /**
@@ -138,7 +138,7 @@ class OpenVZApi {
      * @return mixed
      */
     public static function stop($ctid){
-        return ssh2_exec(self::$ssh, "/usr/bin/sudo /usr/sbin/vzctl stop {$ctid}");
+        return ssh2_exec($this->ssh, "/usr/bin/sudo /usr/sbin/vzctl stop {$ctid}");
     }
 
     /**
@@ -147,7 +147,7 @@ class OpenVZApi {
      * @return mixed
      */
     public static function vrestart($ctid){
-        return ssh2_exec(self::$ssh, "/usr/bin/sudo /usr/sbin/vzctl restart {$ctid}");
+        return ssh2_exec($this->ssh, "/usr/bin/sudo /usr/sbin/vzctl restart {$ctid}");
     }
 
     /**
@@ -156,7 +156,7 @@ class OpenVZApi {
      * @return mixed
      */
     public static function suspend($ctid){
-        return ssh2_exec(self::$ssh, "/usr/bin/sudo /usr/sbin/vzctl set {$ctid} --disabled yes --save; /usr/bin/sudo /usr/sbin/vzctl stop {$ctid}");
+        return ssh2_exec($this->ssh, "/usr/bin/sudo /usr/sbin/vzctl set {$ctid} --disabled yes --save; /usr/bin/sudo /usr/sbin/vzctl stop {$ctid}");
     }
 
     /**
@@ -165,7 +165,7 @@ class OpenVZApi {
      * @return mixed
      */
     public static function unsuspend($ctid){
-        return ssh2_exec(self::$ssh, "/usr/bin/sudo /usr/sbin/vzctl set {$ctid} --disabled no --save; /usr/bin/sudo /usr/sbin/vzctl start {$ctid}");
+        return ssh2_exec($this->ssh, "/usr/bin/sudo /usr/sbin/vzctl set {$ctid} --disabled no --save; /usr/bin/sudo /usr/sbin/vzctl start {$ctid}");
     }
 
     /**
@@ -175,7 +175,7 @@ class OpenVZApi {
      * @return mixed
      */
     public static function set_password($ctid,$password){
-        return ssh2_exec(self::$ssh, "/usr/bin/sudo /usr/sbin/vzctl start {$ctid}; /usr/bin/sudo /usr/sbin/vzctl set {$ctid} --userpasswd root:{$password} --save");
+        return ssh2_exec($this->ssh, "/usr/bin/sudo /usr/sbin/vzctl start {$ctid}; /usr/bin/sudo /usr/sbin/vzctl set {$ctid} --userpasswd root:{$password} --save");
     }
 
     /**
@@ -185,7 +185,7 @@ class OpenVZApi {
      * @return mixed
      */
     public static function set_hostname($ctid,$hostname){
-        return ssh2_exec(self::$ssh, "/usr/bin/sudo /usr/sbin/vzctl start {$ctid}; /usr/bin/sudo /usr/sbin/vzctl set {$ctid} --hostname {$hostname} --save");
+        return ssh2_exec($this->ssh, "/usr/bin/sudo /usr/sbin/vzctl start {$ctid}; /usr/bin/sudo /usr/sbin/vzctl set {$ctid} --hostname {$hostname} --save");
     }
 
     /**
@@ -196,7 +196,7 @@ class OpenVZApi {
      * @return mixed
      */
     public static function set_dns($ctid,$dns1,$dns2){
-        return ssh2_exec(self::$ssh, "/usr/bin/sudo /usr/sbin/vzctl set $ctid --nameserver {$dns1}  --nameserver {$dns2} --save;");
+        return ssh2_exec($this->ssh, "/usr/bin/sudo /usr/sbin/vzctl set $ctid --nameserver {$dns1}  --nameserver {$dns2} --save;");
     }
 
     /**
@@ -212,7 +212,7 @@ class OpenVZApi {
                 /usr/bin/sudo /usr/sbin/vzctl start {$ctid}
                 /usr/bin/sudo /usr/sbin/vzctl exec {$ctid} mkdir -p /dev/net
                 /usr/bin/sudo /usr/sbin/vzctl exec {$ctid} mknod /dev/net/tun c 10 200";
-        return ssh2_exec(self::$ssh, $commands);
+        return ssh2_exec($this->ssh, $commands);
     }
 
     /**
@@ -226,7 +226,7 @@ class OpenVZApi {
                 /usr/bin/sudo /usr/sbin/vzctl stop {$ctid}
                 /usr/bin/sudo /usr/sbin/vzctl set {$ctid} --capability net_admin:off --save
                 /usr/bin/sudo /usr/sbin/vzctl start {$ctid}";
-        return ssh2_exec(self::$ssh, $commands);
+        return ssh2_exec($this->ssh, $commands);
     }
 
     /**
@@ -238,7 +238,7 @@ class OpenVZApi {
         $commands = "/usr/bin/sudo /usr/sbin/vzctl stop {$ctid}
                 /usr/bin/sudo /usr/sbin/vzctl set {$ctid} --features ppp:on --save
                 /usr/bin/sudo /usr/sbin/vzctl start {$ctid}";
-        return ssh2_exec(self::$ssh, $commands);
+        return ssh2_exec($this->ssh, $commands);
     }
 
     /**
@@ -251,7 +251,7 @@ class OpenVZApi {
                 /usr/bin/sudo /usr/sbin/vzctl stop {$ctid};
                 /usr/bin/sudo /usr/sbin/vzctl start {$ctid};
                 ";
-        return ssh2_exec(self::$ssh, $commands);
+        return ssh2_exec($this->ssh, $commands);
     }
 
     /**
@@ -260,7 +260,7 @@ class OpenVZApi {
      * @return bool
      */
     public static function tuntap_status($ctid){
-        if(strlen(ssh2_exec(self::$ssh, "/usr/bin/sudo /usr/sbin/vzctl exec {$ctid} cat /dev/net/tun")) == 48){
+        if(strlen(ssh2_exec($this->ssh, "/usr/bin/sudo /usr/sbin/vzctl exec {$ctid} cat /dev/net/tun")) == 48){
             return true;
         }
         return false;
@@ -272,7 +272,7 @@ class OpenVZApi {
      * @return bool
      */
     public static function ppp_status($ctid){
-        if(strlen(ssh2_exec(self::$ssh, "/usr/bin/sudo /usr/sbin/vzctl exec {$ctid} cat /dev/ppp")) == 41){
+        if(strlen(ssh2_exec($this->ssh, "/usr/bin/sudo /usr/sbin/vzctl exec {$ctid} cat /dev/ppp")) == 41){
             return true;
         }
         return false;
@@ -284,13 +284,13 @@ class OpenVZApi {
      * @return mixed
      */
     public static function status($ctid){
-        return ssh2_exec(self::$ssh, "/usr/sbin/vzlist {$ctid} -Ho status");
+        return ssh2_exec($this->ssh, "/usr/sbin/vzlist {$ctid} -Ho status");
     }
 
     public static function tc_create($params){
         if(count($params->ips) > 1){
             foreach($params->ips as $ip) {
-                switch(self::ip_check($ip)){
+                switch($this->p_check($ip)){
                     case 'v4':
                         $fi = "/sbin/tc filter add dev venet0 protocol ip parent 1:0 prio {$params->ctid} u32 match ip dst {$params->ip} flowid 1:{$params->bwin};";
                         $fo = "/sbin/tc filter add dev {$params->interface} protocol ip parent 1:0 prio {$params->ctid} u32 match ip dst {$params->ip} flowid 1:{$params->bwout};";
@@ -310,7 +310,7 @@ class OpenVZApi {
                     {$fo}";
             }
         } else {
-            switch(self::ip_check($params->ip)){
+            switch($this->p_check($params->ip)){
                 case 'v4':
                     $fi = "/sbin/tc filter add dev venet0 protocol ip parent 1:0 prio {$params->ctid} u32 match ip dst {$params->ip} flowid 1:{$params->bwin}";
                     $fo = "/sbin/tc filter add dev {$params->interface} protocol ip parent 1:0 prio {$params->ctid} u32 match ip dst {$params->ip} flowid 1:{$params->bwout}";
@@ -329,13 +329,13 @@ class OpenVZApi {
                 /sbin/tc qdisc add dev {$params->interface} parent 1:{$params->bwout} handle {$params->bwout}: sfq perturb 10
                 {$fo}";
         }
-        return ssh2_exec(self::$ssh, $commands);
+        return ssh2_exec($this->ssh, $commands);
     }
 
     public static function tc_destroy($params){
         $commands = "/sbin/tc filter del dev venet0 prio {$params->ctid}
                 /sbin/tc filter del dev {$params->interface} prio {$params->ctid}";
-        return ssh2_exec(self::$ssh, $commands);
+        return ssh2_exec($this->ssh, $commands);
     }
 
  
@@ -359,11 +359,19 @@ class OpenVZApi {
 
     /**
      * Get list of all VM's (Started, Stopped)
-     * @return json array
+     * @return array
      */
     public static function vzlist(){
         $commands = "/usr/bin/sudo vzlist -j -a";
-        return ssh2_exec(self::$ssh, $commands);
+        $stream = ssh2_exec($this->ssh, $commands);
+
+        stream_set_blocking($stream, true);
+        $stream_out = ssh2_fetch_stream($stream, SSH2_STREAM_STDIO);
+
+        $json = str_replace('9223372036854775807', '1', stream_get_contents($stream_out));
+        $decoded_json = json_decode($json);
+
+        return $decoded_json;
     }
 
     /**
@@ -373,7 +381,15 @@ class OpenVZApi {
      */
     public static function showVZ($ctid){
         $commands = "/usr/bin/sudo vzlist {$ctid} -j";
-        return ssh2_exec(self::$ssh, $commands);
+        $stream = ssh2_exec($this->ssh, $commands);
+
+        stream_set_blocking($stream, true);
+        $stream_out = ssh2_fetch_stream($stream, SSH2_STREAM_STDIO);
+
+        $json = str_replace('9223372036854775807', '1', stream_get_contents($stream_out));
+        $decoded_json = json_decode($json);
+
+        return $decoded_json;
     }
 
     /**
