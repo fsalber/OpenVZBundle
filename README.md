@@ -45,22 +45,12 @@ public function indexAction()
     // Call OpenVZApi class from OpenVZBundle with login info as param
     $api = new OpenVZApi('HOST', 'USERNAME', 'PASSWORD', PORT);
 
-    // This command return you JSON Array as Stream
-    $stream = $api->vzlist();
-
-    // Let's decrypt Stream
-    stream_set_blocking($stream, true);
-    $stream_out = ssh2_fetch_stream($stream, SSH2_STREAM_STDIO);
-
-    // Prevent PHP from display error due to too big integer
-    $json = str_replace('9223372036854775807', '1', stream_get_contents($stream_out));
-
-    // Decode JSON Array
-    $decoded_json = json_decode($json);
+    // This command return you JSON Array
+    $json = $api->vzlist();
 
     // Render your view and give as param the decoded json array
     return $this->render('YOURBUNDLE:YOURCONTROLLER:index.html.twig', array(
-        'json' => $decoded_json
+        'json' => $json
     ));
 }
 ```
